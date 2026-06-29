@@ -32,6 +32,7 @@ src/main/java/com/bandhub
 |   +-- UserController.java
 +-- dto
 |   +-- UserResponseDTO.java
+|   +-- UserCreateDTO.java
 +-- model
 |   +-- UserEntity.java
 +-- repository
@@ -123,6 +124,18 @@ Returns a list of users using `UserResponseDTO`.
 
 The response intentionally excludes `passwordHash`.
 
+### Create user
+
+```http
+POST /api/users
+```
+
+Current status: endpoint contract prepared, implementation pending.
+
+Expected request DTO: `UserCreateDTO`.
+
+Expected response DTO: `UserResponseDTO`.
+
 ## Development Decisions
 
 - Code, packages, classes, methods, and variables are written in English.
@@ -137,13 +150,12 @@ The response intentionally excludes `passwordHash`.
 
 ## Next Steps
 
-- Refactor dependency injection from field injection with `@Autowired` to constructor injection.
-- Confirm `UserController` uses `@RestController` for REST JSON responses.
-- Implement `POST /api/users`.
-- Create `UserCreateRequestDTO`.
-- Add validation with `@Valid`, `@NotBlank`, `@Email`, and `@Size`.
-- Add service methods for user creation.
-- Add repository methods such as `existsByEmail`.
+- Implement `POST /api/users` service logic.
+- Convert `UserCreateDTO` into `UserEntity` inside `UserServiceImpl`.
+- Check duplicated emails using `existsByEmail`.
+- Assign default values such as `globalRole`, `active`, `createdAt`, and `lookingForBand`.
+- Return `UserResponseDTO` after saving the user.
+- Clean unused imports in `UserController` and `UserService`.
 - Later: configure Spring Security properly.
 
 ## Development Log
@@ -179,6 +191,36 @@ Learned:
 
 Pending:
 
-- Apply constructor injection in controller and service implementation.
-- Change `UserController` to `@RestController`.
 - Implement `POST /api/users` in the next session.
+
+### 2026-06-29
+
+Prepared user creation endpoint contract.
+
+Changes:
+
+- Confirmed `UserController` uses `@RestController`.
+- Confirmed controller and service implementation use constructor injection.
+- Created `UserCreateDTO` as a request DTO for user creation.
+- Added validation annotations to `UserCreateDTO`: `@NotBlank`, `@Email`, and `@Size`.
+- Added `POST /api/users` endpoint signature in `UserController`.
+- Added `@Valid` to trigger request DTO validation.
+- Changed the create-user flow to receive `UserCreateDTO` instead of `UserEntity`.
+- Changed the create-user response type to `UserResponseDTO`.
+- Added `createUser(UserCreateDTO user)` to `UserService`.
+- Added `existsByEmail(String email)` to `UserRepository`.
+
+Learned:
+
+- Why request DTOs and response DTOs should be different.
+- Why controllers should not receive JPA entities directly from the API.
+- How `@Valid` activates Bean Validation annotations on request bodies.
+- Why `ResponseEntity.status(HttpStatus.CREATED).body(...)` is simpler than `ResponseEntity.created(...)` when no resource URI is being returned yet.
+- How Spring Data JPA derives queries from method names such as `existsByEmail`.
+
+Pending:
+
+- Implement `UserServiceImpl.createUser`.
+- Decide how to handle duplicated emails.
+- Decide where password hashing will happen before integrating Spring Security properly.
+- Remove unused imports if they remain after the implementation.
