@@ -130,7 +130,7 @@ The response intentionally excludes `passwordHash`.
 POST /api/users
 ```
 
-Current status: endpoint contract prepared, implementation pending.
+Current status: endpoint and service implementation completed; security configuration and endpoint testing are pending.
 
 Expected request DTO: `UserCreateDTO`.
 
@@ -150,13 +150,12 @@ Expected response DTO: `UserResponseDTO`.
 
 ## Next Steps
 
-- Implement `POST /api/users` service logic.
-- Convert `UserCreateDTO` into `UserEntity` inside `UserServiceImpl`.
-- Check duplicated emails using `existsByEmail`.
-- Assign default values such as `globalRole`, `active`, `createdAt`, and `lookingForBand`.
-- Return `UserResponseDTO` after saving the user.
-- Clean unused imports in `UserController` and `UserService`.
-- Later: configure Spring Security properly.
+- Configure Spring Security so `POST /api/users` can be tested safely.
+- Test user creation and verify that BCrypt hashes are stored in PostgreSQL.
+- Replace the temporary `IllegalArgumentException` with a domain-specific exception.
+- Add global API error handling with `@RestControllerAdvice`.
+- Normalize emails and define case-insensitive duplicate handling.
+- Introduce Flyway later for professional database migrations.
 
 ## Development Log
 
@@ -224,3 +223,35 @@ Pending:
 - Decide how to handle duplicated emails.
 - Decide where password hashing will happen before integrating Spring Security properly.
 - Remove unused imports if they remain after the implementation.
+
+### 2026-06-30
+
+Implemented the user creation service and password hashing.
+
+Changes:
+
+- Implemented `UserServiceImpl.createUser`.
+- Added duplicate email checking with `existsByEmail`.
+- Added the mapping from `UserCreateDTO` to `UserEntity`.
+- Saved the user through `UserRepository` and returned `UserResponseDTO`.
+- Renamed `globalRole` to `role`.
+- Created the `UserRole` enum with `USER` and `ADMIN` values.
+- Configured enum persistence with `@Enumerated(EnumType.STRING)`.
+- Added `SecurityConfig` with a `PasswordEncoder` bean.
+- Injected `PasswordEncoder` into `UserServiceImpl` using constructor injection.
+- Added BCrypt password hashing before persistence.
+
+Learned:
+
+- Difference between a global application role and a role within a band.
+- Why enums are safer than unrestricted strings for predefined roles.
+- How `@Configuration` and `@Bean` register objects managed by Spring.
+- Why passwords must never be stored as plain text.
+- How BCrypt uses a salt and verifies passwords without decrypting their hashes.
+- Why constructor injection does not require `@Autowired` when there is only one constructor.
+
+Pending:
+
+- Configure the Spring Security filter chain for the REST API.
+- Test `POST /api/users` and inspect the stored BCrypt hash.
+- Return an appropriate HTTP error when an email is already registered.

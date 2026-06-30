@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bandhub.dto.UserCreateDTO;
 import com.bandhub.dto.UserResponseDTO;
-import com.bandhub.model.UserEntity;
+
 import com.bandhub.service.UserService;
 
 import jakarta.validation.Valid;

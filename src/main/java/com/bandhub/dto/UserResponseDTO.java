@@ -2,12 +2,14 @@ package com.bandhub.dto;
 
 import java.time.LocalDateTime;
 
+import com.bandhub.model.UserRole;
+
 public record UserResponseDTO(
         Long id,
         String name,
         String surname,
         String email,
-        String globalRole,
+        UserRole role,
         String mainInstrument,
         String location,
         String bio,
