@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
         
 
         if(userRepository.existsByEmail(user.email())){
-           System.out.println("Ya existe un usuario registrado con email: " + user.email());
+          
            throw new IllegalArgumentException("Email ya existe.");
          
         }

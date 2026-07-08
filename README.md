@@ -30,11 +30,14 @@ src/main/java/com/bandhub
 +-- BandhubApplication.java
 +-- controller
 |   +-- UserController.java
++-- config
+|   +-- SecurityConfig.java
 +-- dto
 |   +-- UserResponseDTO.java
 |   +-- UserCreateDTO.java
 +-- model
 |   +-- UserEntity.java
+|   +-- UserRole.java
 +-- repository
 |   +-- UserRepository.java
 +-- service
@@ -61,7 +64,7 @@ Current fields:
 - `surname`
 - `email`
 - `password_hash`
-- `global_role`
+- `role`
 - `main_instrument`
 - `location`
 - `bio`
@@ -89,7 +92,7 @@ CREATE DATABASE bandhub;
 The current local configuration expects:
 
 ```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/bandhub
+spring.datasource.url=jdbc:postgresql://localhost:5433/bandhub
 spring.datasource.username=postgres
 spring.datasource.password=1234
 ```
@@ -110,7 +113,7 @@ Expected local URL:
 http://localhost:8080
 ```
 
-Spring Security is currently using its default generated development password. A custom authentication flow will be implemented later.
+Spring Security is currently configured to allow the first public user endpoints. A custom authentication flow will be implemented later.
 
 ## Current API
 
@@ -130,11 +133,18 @@ The response intentionally excludes `passwordHash`.
 POST /api/users
 ```
 
-Current status: endpoint and service implementation completed; security configuration and endpoint testing are pending.
+Current status: endpoint, service implementation, password hashing, security access, and manual testing completed.
 
 Expected request DTO: `UserCreateDTO`.
 
 Expected response DTO: `UserResponseDTO`.
+
+Current behavior:
+
+- Creates a user in PostgreSQL.
+- Hashes the password with BCrypt before saving.
+- Returns public user data through `UserResponseDTO`.
+- Does not expose `passwordHash` in the API response.
 
 ## Development Decisions
 
@@ -150,11 +160,10 @@ Expected response DTO: `UserResponseDTO`.
 
 ## Next Steps
 
-- Configure Spring Security so `POST /api/users` can be tested safely.
-- Test user creation and verify that BCrypt hashes are stored in PostgreSQL.
 - Replace the temporary `IllegalArgumentException` with a domain-specific exception.
 - Add global API error handling with `@RestControllerAdvice`.
 - Normalize emails and define case-insensitive duplicate handling.
+- Review and standardize DTO file/class naming.
 - Introduce Flyway later for professional database migrations.
 
 ## Development Log
@@ -255,3 +264,36 @@ Pending:
 - Configure the Spring Security filter chain for the REST API.
 - Test `POST /api/users` and inspect the stored BCrypt hash.
 - Return an appropriate HTTP error when an email is already registered.
+
+### 2026-07-08
+
+Configured the first public security rules and manually tested user creation.
+
+Changes:
+
+- Added a `SecurityFilterChain` in `SecurityConfig`.
+- Allowed public access to `POST /api/users` for user registration.
+- Allowed public access to `GET /api/users` for development testing.
+- Disabled CSRF temporarily for the REST API development phase.
+- Tested `POST /api/users` successfully.
+- Verified that the API returns a `UserResponseDTO` without the password hash.
+- Detected and fixed the local database mismatch caused by the old `global_role` column after renaming it to `role`.
+- Confirmed duplicated email detection in `UserServiceImpl`.
+- Confirmed Bean Validation works for invalid request fields.
+
+Learned:
+
+- A `403 Forbidden` can come from Spring Security, but logs must be checked before assuming the cause.
+- If Hibernate reaches `select` and `insert`, the request passed the security filter chain.
+- `ddl-auto=update` does not reliably handle column renames.
+- During early development, dropping and recreating a table can be acceptable when there is no valuable data.
+- `SecurityFilterChain` defines which requests are public and which require authentication.
+- `csrf().disable()` is acceptable temporarily for a stateless REST API under development, but must be revisited when authentication is designed.
+
+Pending:
+
+- Replace the temporary `IllegalArgumentException` with a custom exception.
+- Add `GlobalExceptionHandler` with `@RestControllerAdvice`.
+- Return `409 Conflict` when an email is already registered.
+- Improve validation error responses for invalid request bodies.
+- Normalize email values before checking duplicates and saving.
