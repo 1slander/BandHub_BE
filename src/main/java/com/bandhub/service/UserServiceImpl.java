@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.bandhub.dto.UserCreateDTO;
 import com.bandhub.dto.UserResponseDTO;
+import com.bandhub.exception.EmailAlreadyExistsException;
 import com.bandhub.model.UserEntity;
 import com.bandhub.repository.UserRepository;
 
@@ -37,12 +38,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDTO createUser(UserCreateDTO user) {
 
+        String normalizedEmail = normalizeEmail(user.email());
         
-
-        if(userRepository.existsByEmail(user.email())){
-          
-           throw new IllegalArgumentException("Email ya existe.");
-         
+        if (userRepository.existsByEmail(normalizedEmail)) {
+             throw new EmailAlreadyExistsException(normalizedEmail);
         }
 
         // Posibles validaciones avanzadas
@@ -51,7 +50,7 @@ public class UserServiceImpl implements UserService {
 
         UserEntity newUser = new UserEntity();
 
-        newUser.setEmail(user.email());
+        newUser.setEmail(normalizedEmail);
         // Tenemos que hash el password
         newUser.setPasswordHash(passwordEncoder.encode(user.password()));
         newUser.setName(user.name());
@@ -84,5 +83,10 @@ public class UserServiceImpl implements UserService {
                 user.getLookingForBand(),
                 user.getCreatedAt(),
                 user.getActive());
+    }
+
+
+    private String normalizeEmail(String email){
+        return email.trim().toLowerCase();
     }
 }

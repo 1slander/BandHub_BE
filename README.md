@@ -35,6 +35,7 @@ src/main/java/com/bandhub
 +-- dto
 |   +-- UserResponseDTO.java
 |   +-- UserCreateDTO.java
+|   +-- ApiErrorResponse.java
 +-- model
 |   +-- UserEntity.java
 |   +-- UserRole.java
@@ -52,6 +53,7 @@ src/main/java/com/bandhub
 - `service`: business logic and orchestration between controllers and repositories.
 - `controller`: REST endpoints exposed to the frontend.
 - `dto`: objects used to define API input and output data.
+- `exception`: custom exceptions and global REST API error handling.
 
 ## Current Database Model
 
@@ -143,8 +145,28 @@ Current behavior:
 
 - Creates a user in PostgreSQL.
 - Hashes the password with BCrypt before saving.
+- Normalizes email values before checking duplicates and saving.
 - Returns public user data through `UserResponseDTO`.
 - Does not expose `passwordHash` in the API response.
+
+### Error responses
+
+The API uses `ApiErrorResponse` for controlled errors.
+
+Example:
+
+```json
+{
+  "status": 409,
+  "error": "Conflict",
+  "message": "Email already exists: admin@mail.com",
+  "path": "/api/users",
+  "timestamp": "2026-07-16T18:00:00",
+  "errors": null
+}
+```
+
+Validation errors return field-level messages in `errors`.
 
 ## Development Decisions
 
@@ -160,9 +182,9 @@ Current behavior:
 
 ## Next Steps
 
-- Replace the temporary `IllegalArgumentException` with a domain-specific exception.
-- Add global API error handling with `@RestControllerAdvice`.
-- Normalize emails and define case-insensitive duplicate handling.
+- Add `GET /api/users/{id}`.
+- Add `UserNotFoundException`.
+- Return `404 Not Found` when a user does not exist.
 - Review and standardize DTO file/class naming.
 - Introduce Flyway later for professional database migrations.
 
@@ -297,3 +319,37 @@ Pending:
 - Return `409 Conflict` when an email is already registered.
 - Improve validation error responses for invalid request bodies.
 - Normalize email values before checking duplicates and saving.
+
+### 2026-07-16
+
+Improved API error handling and email consistency.
+
+Changes:
+
+- Created `EmailAlreadyExistsException` as a domain-specific exception.
+- Added `GlobalExceptionHandler` with `@RestControllerAdvice`.
+- Replaced the temporary `IllegalArgumentException` in `UserServiceImpl`.
+- Created `ApiErrorResponse` as the common error response DTO.
+- Changed duplicated email errors to return `409 Conflict`.
+- Added handling for `MethodArgumentNotValidException`.
+- Validation errors now return field-level messages using `Map<String, String>`.
+- Added email normalization before checking duplicates and saving users.
+- Kept `normalizeEmail` as a private method in `UserServiceImpl` because it is only used there for now.
+
+Learned:
+
+- How `@ExceptionHandler` maps exceptions to HTTP responses.
+- Why `@RestControllerAdvice` is useful for global API error handling.
+- What `WebRequest` represents and how it provides request context such as the URI path.
+- Why API errors should return structured JSON instead of plain strings.
+- Why `Map<String, String>` fits field validation errors.
+- Difference between the `Map` abstraction and the `HashMap` implementation.
+- Why emails should be normalized before duplicate checks.
+
+Pending:
+
+- Add `GET /api/users/{id}`.
+- Add `UserNotFoundException`.
+- Return `404 Not Found` using `ApiErrorResponse`.
+- Clean temporary comments in `UserServiceImpl`.
+- Consider `Locale.ROOT` in email normalization later.
