@@ -103,3 +103,21 @@ Entry format:
 Only add an entry the first time a concept comes up, or when it's revisited
 in a way that changes/deepens the earlier explanation — don't duplicate
 entries for the same concept.
+
+## Session close
+
+When the user signals they're ending the session for now (phrases like
+"hasta mañana", "lo dejamos aquí", "nos vemos", "paro por hoy", or similar —
+in Spanish or English), before responding, update the project's living docs
+to reflect what happened in this session:
+
+- `STATE.md`: rewrite it to reflect the new "where I left off" — current
+  phase, last file(s) touched, next concrete step, any open decisions or
+  blockers.
+- `APPROADMAP.md`: check off any completed items from this session.
+- `README.md` Development Log: add a new dated entry (changes, what was
+  learned, what's pending), following the existing entries' format.
+
+Summarize briefly in the reply what was updated — don't ask for permission
+first, since this is just documentation reflecting work already done in the
+session.
