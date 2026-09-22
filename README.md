@@ -23,6 +23,41 @@ The MVP starts with a small relational model and will grow iteratively.
 - Future frontend: Angular with TypeScript
 - Future cloud: AWS S3, AWS RDS, AWS EC2
 
+## Roadmap
+
+This is a solo, learning-driven project, run with the discipline of a
+professional full-stack build. There are four learning axes, developed
+together over time rather than one after another:
+
+- **Backend (Java + Spring Boot):** build the most professionally-structured
+  backend possible — layered architecture, security, proper error handling,
+  migrations — as the foundation everything else sits on.
+- **Frontend (Angular + TypeScript):** learned with the same depth as the
+  backend, not bolted on superficially at the end.
+- **Cloud (AWS):** deployment and managed database (RDS), later file/audio
+  storage (S3) — introduced once there's something real worth deploying.
+- **AI usage:** learning to work effectively with AI assistance as its own
+  skill, not just using it passively to generate code.
+
+### Backend-first, then parallel vertical slices
+
+Rather than finishing the entire backend before starting Angular, or
+building both from scratch at the same time, the plan is a middle path:
+
+1. Mature the backend to a minimum real baseline first:
+   - Working authentication (login + JWT).
+   - At least one domain module beyond `User` (a basic `Band`: create and
+     list bands).
+2. Once that baseline exists, backend and frontend move forward together,
+   feature by feature: each new capability is built as a full vertical
+   slice — the backend endpoint and the Angular screen that consumes it,
+   in the same iteration — instead of "all backend, then all frontend."
+
+This keeps Angular development grounded in a real API (with auth and error
+handling already in place) instead of a toy backend, and keeps the project
+moving on both fronts without excessive context-switching early on, while
+still learning both technologies to a professional depth.
+
 ## Current Backend Structure
 
 ```text
