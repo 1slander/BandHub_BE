@@ -60,4 +60,23 @@ public class GlobalExceptionHandler {
 
     }
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public  ResponseEntity<ApiErrorResponse> handleUserNotFound(UserNotFoundException exception, WebRequest request){
+        HttpStatus status = HttpStatus.NOT_FOUND;
+
+         ApiErrorResponse response = new ApiErrorResponse(
+            status.value(),
+            status.getReasonPhrase(),
+            exception.getMessage(),
+            request.getDescription(false).replace("uri=", ""),
+            LocalDateTime.now(),
+            null
+        );
+
+        return ResponseEntity
+            .status(status)
+            .body(response);
+
+    }
+
 }

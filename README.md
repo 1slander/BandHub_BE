@@ -182,9 +182,10 @@ Validation errors return field-level messages in `errors`.
 
 ## Next Steps
 
-- Add `GET /api/users/{id}`.
-- Add `UserNotFoundException`.
-- Return `404 Not Found` when a user does not exist.
+- Add `findUserById` to `UserService` and implement it in `UserServiceImpl`.
+- Add `GET /api/users/{id}` to `UserController`.
+- Update `SecurityConfig` to permit `GET /api/users/{id}` (current matchers are exact paths, not wildcards, so this endpoint would 403 as-is).
+- Manually test both cases: existing id and non-existing id (404).
 - Review and standardize DTO file/class naming.
 - Introduce Flyway later for professional database migrations.
 
@@ -353,3 +354,27 @@ Pending:
 - Return `404 Not Found` using `ApiErrorResponse`.
 - Clean temporary comments in `UserServiceImpl`.
 - Consider `Locale.ROOT` in email normalization later.
+
+### 2026-09-22
+
+Started the `GET /api/users/{id}` feature: created the domain exception and its
+error handling. Also added project documentation for AI-assisted sessions.
+
+Changes:
+
+- Created `UserNotFoundException` in the `exception` package, following the same pattern as `EmailAlreadyExistsException`.
+- Added `handleUserNotFound` to `GlobalExceptionHandler`, mapping `UserNotFoundException` to `404 Not Found` via `ApiErrorResponse`.
+- Added `CLAUDE.md` with project context, commands, architecture notes, and working-style guidance for AI-assisted sessions.
+- Added `CONCEPTS.md` as a personal glossary for concepts learned during development, with its first entry on checked vs unchecked exceptions.
+
+Learned:
+
+- The real distinction between checked and unchecked exceptions is whether the compiler forces a `try/catch` or `throws` declaration before it will compile, not when the error happens at runtime.
+- Why domain exceptions in this project extend `RuntimeException` (unchecked): a checked exception would force `throws UserNotFoundException` onto `UserService`, `UserServiceImpl`, and the controller method, just so `GlobalExceptionHandler` can intercept it higher up. Unchecked exceptions propagate to the `@RestControllerAdvice` without polluting every signature in between.
+
+Pending:
+
+- Add `findUserById` to `UserService` and implement it in `UserServiceImpl`.
+- Add `GET /api/users/{id}` to `UserController`.
+- Update `SecurityConfig` to permit `GET /api/users/{id}`.
+- Manually test both cases: existing id and non-existing id (404).
