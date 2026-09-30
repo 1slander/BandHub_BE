@@ -1,4 +1,4 @@
-# APPROADMAP.md
+# APP_ROADMAP.md
 
 Guía viva de construcción de BandHub, organizada por fases y por
 módulo/controller → endpoints. A diferencia del "Development Log" del
@@ -17,10 +17,11 @@ nuevas según van surgiendo (no hay que planificarlo todo de antemano).
 
 - [x] `GET /api/users` — listado
 - [x] `POST /api/users` — creación
-- [ ] `GET /api/users/{id}` — con `UserNotFoundException` + 404 (en curso)
+- [x] `GET /api/users/{id}` — con `UserNotFoundException` + 404
 - [ ] `PUT /api/users/{id}` — actualizar perfil propio (nombre, instrumento, ubicación, bio, lookingForBand)
 - [ ] `DELETE /api/users/{id}` — baja lógica (`active = false`, no borrado físico)
 - [ ] Revisar naming de DTOs y limpiar comentarios temporales
+- [ ] Introducir testing (unit tests de services con repositorios mockeados, integration tests de controllers) — empezar ya, de forma incremental, no esperar a que crezca más el código
 
 ## Fase 2 — Autenticación (bloqueante para el resto)
 
@@ -103,9 +104,16 @@ empezar a avanzar en paralelo, feature a feature.**
 
 ## Fase 6 — Infraestructura transversal
 
+Simula el flujo de trabajo real: local (Docker) → "pre" de práctica (IONOS,
+sin coste) → "prod" (AWS). El objetivo de IONOS no es sustituir AWS, sino
+practicar el despliegue en un entorno de bajo riesgo antes de hacerlo en la
+nube de verdad, una vez exista el baseline de JWT + `Band` (Fases 2-3).
+
+- [ ] Levantar la base de datos local con `docker-compose` (en curso)
 - [ ] Introducir Flyway (sustituir `ddl-auto=update`)
+- [ ] Desplegar el backend en el servidor IONOS personal — práctica de despliegue ("pre")
 - [ ] Migrar almacenamiento de ficheros a AWS S3
-- [ ] Desplegar backend en AWS (EC2 o similar)
+- [ ] Desplegar backend en AWS (EC2 o similar) — ("prod")
 - [ ] Base de datos en AWS RDS
 
 ## Fase 7 — Angular

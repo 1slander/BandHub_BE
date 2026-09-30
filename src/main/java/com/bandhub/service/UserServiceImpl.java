@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.bandhub.dto.UserCreateDTO;
 import com.bandhub.dto.UserResponseDTO;
 import com.bandhub.exception.EmailAlreadyExistsException;
+import com.bandhub.exception.UserNotFoundException;
 import com.bandhub.model.UserEntity;
 import com.bandhub.repository.UserRepository;
 
@@ -70,6 +71,17 @@ public class UserServiceImpl implements UserService {
     }
 
 
+       @Override
+    public UserResponseDTO findUserId(Long id) {
+        
+        UserEntity user = userRepository.findById(id).orElseThrow(()-> new UserNotFoundException(id));
+
+        return toResponse(user);
+
+    
+    }
+
+
     private UserResponseDTO toResponse(UserEntity user) {
         return new UserResponseDTO(
                 user.getId(),
@@ -89,4 +101,7 @@ public class UserServiceImpl implements UserService {
     private String normalizeEmail(String email){
         return email.trim().toLowerCase();
     }
+
+
+ 
 }

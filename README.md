@@ -217,12 +217,7 @@ Validation errors return field-level messages in `errors`.
 
 ## Next Steps
 
-- Add `findUserById` to `UserService` and implement it in `UserServiceImpl`.
-- Add `GET /api/users/{id}` to `UserController`.
-- Update `SecurityConfig` to permit `GET /api/users/{id}` (current matchers are exact paths, not wildcards, so this endpoint would 403 as-is).
-- Manually test both cases: existing id and non-existing id (404).
-- Review and standardize DTO file/class naming.
-- Introduce Flyway later for professional database migrations.
+Tracked in `APP_ROADMAP.md`, organized by phase and module/controller, with checkboxes. That file is the single source of truth for what's next — this README keeps only the historical Development Log below.
 
 ## Development Log
 
@@ -413,3 +408,34 @@ Pending:
 - Add `GET /api/users/{id}` to `UserController`.
 - Update `SecurityConfig` to permit `GET /api/users/{id}`.
 - Manually test both cases: existing id and non-existing id (404).
+
+### 2026-09-30
+
+Finished `GET /api/users/{id}`, restructured the project's planning docs, and
+started learning `docker-compose`.
+
+Changes:
+
+- Implemented `findUserId` in `UserService`/`UserServiceImpl`, using `userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id))`.
+- Added `GET /api/users/{userId}` to `UserController` (fixed a bug along the way: used `@RequestParam` instead of `@PathVariable`, which would have looked for a query string param instead of reading the path segment).
+- Added an explicit `GET /api/users/{userId}` matcher to `SecurityConfig` (the existing matchers were exact paths, so this route would otherwise 403 under `anyRequest().authenticated()`).
+- Manually tested both cases: existing id (200 with the DTO) and non-existing id (404 via `ApiErrorResponse`) — confirmed working.
+- Introduced `APP_ROADMAP.md` (renamed from an initial `APPROADMAP.md`) as the single source of truth for what's next, organized by phase and module/controller with checkboxes.
+- Introduced `STATE.md` as a fast "where I left off" snapshot to read first when resuming a session.
+- Simplified `README.md`'s "Next Steps" section to point to `APP_ROADMAP.md` instead of duplicating a separate list.
+- Updated `CLAUDE.md` to reference the renamed `APP_ROADMAP.md` and to describe the role of all three living docs (`README.md`, `APP_ROADMAP.md`, `STATE.md`).
+- Placed the planned IONOS deployment in `APP_ROADMAP.md`'s infrastructure phase as a "pre" practice step before AWS "prod", after the JWT + `Band` baseline.
+- Inspected the currently manually-run `postgres-server` container (`docker inspect`) to capture its exact config (image `postgres:16`, port `5433:5432`, `POSTGRES_PASSWORD=1234`, named volume `mi_db_puerto_nuevo`) as the baseline to replicate in `docker-compose.yml`.
+
+Learned:
+
+- The difference between `@PathVariable` (reads a segment that's part of the URL path itself, declared in `@GetMapping("/{id}")`) and `@RequestParam` (reads a query string parameter after `?`) — using the wrong one compiles fine but fails at request time.
+- Why `Optional<T>` exists: it forces handling the "value might not be there" case at compile time, instead of letting a `null`/`undefined`-style bug surface later, elsewhere (contrasted with how this is normally left implicit in JavaScript).
+- `orElseThrow` takes a `Supplier` (a lambda), not an already-built exception — so the exception object is only constructed if the `Optional` is actually empty, instead of always paying that cost.
+- Why having two separate "what's next" lists (README + a roadmap file) invites drift — consolidated into one source of truth (`APP_ROADMAP.md`).
+
+Pending:
+
+- Decide `docker-compose.yml`'s volume strategy (reuse `mi_db_puerto_nuevo` vs. a fresh named volume) and write the file.
+- Verify `docker compose up -d` / `down` reproduces the same local Postgres setup the app already relies on.
+- Continue with the rest of Fase 1 in `APP_ROADMAP.md` (`PUT`/`DELETE /api/users/{id}`, DTO naming cleanup) or move to Fase 2 (auth/JWT) — to be decided next session.

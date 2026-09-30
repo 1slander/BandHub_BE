@@ -46,7 +46,7 @@ Strict layered architecture: controller → service (interface + Impl) → repos
 
 ## Project journal
 
-`README.md` contains a "Development Log" (date, changes, what was learned, what's pending per session) and a "Next Steps" section. Check both before starting work — they reflect the actual current state faster than this file will.
+`README.md` contains a "Development Log" (date, changes, what was learned, what's pending per session) — the historical record. `APP_ROADMAP.md` is the single source of truth for what's next, organized by phase/module → endpoints, with checkboxes. `STATE.md` is the fastest "where I left off" snapshot. Check all three before starting work — they reflect the actual current state faster than this file will.
 
 
 ## Learning context and working style
@@ -114,7 +114,7 @@ to reflect what happened in this session:
 - `STATE.md`: rewrite it to reflect the new "where I left off" — current
   phase, last file(s) touched, next concrete step, any open decisions or
   blockers.
-- `APPROADMAP.md`: check off any completed items from this session.
+- `APP_ROADMAP.md`: check off any completed items from this session, and add newly agreed next steps in the right phase.
 - `README.md` Development Log: add a new dated entry (changes, what was
   learned, what's pending), following the existing entries' format.
 
