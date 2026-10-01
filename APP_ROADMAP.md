@@ -109,7 +109,7 @@ sin coste) → "prod" (AWS). El objetivo de IONOS no es sustituir AWS, sino
 practicar el despliegue en un entorno de bajo riesgo antes de hacerlo en la
 nube de verdad, una vez exista el baseline de JWT + `Band` (Fases 2-3).
 
-- [ ] Levantar la base de datos local con `docker-compose` (en curso)
+- [x] Levantar la base de datos local con `docker-compose` (`postgres:16`, volumen con nombre, `POSTGRES_DB` auto-crea `bandhub`)
 - [ ] Introducir Flyway (sustituir `ddl-auto=update`)
 - [ ] Desplegar el backend en el servidor IONOS personal — práctica de despliegue ("pre")
 - [ ] Migrar almacenamiento de ficheros a AWS S3

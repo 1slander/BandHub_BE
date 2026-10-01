@@ -439,3 +439,28 @@ Pending:
 - Decide `docker-compose.yml`'s volume strategy (reuse `mi_db_puerto_nuevo` vs. a fresh named volume) and write the file.
 - Verify `docker compose up -d` / `down` reproduces the same local Postgres setup the app already relies on.
 - Continue with the rest of Fase 1 in `APP_ROADMAP.md` (`PUT`/`DELETE /api/users/{id}`, DTO naming cleanup) or move to Fase 2 (auth/JWT) — to be decided next session.
+
+### 2026-10-01
+
+Wrote and verified `docker-compose.yaml` for the local PostgreSQL setup.
+
+Changes:
+
+- Decided to use a fresh named volume (`bandhub_pg_database`) instead of reusing the old manually-created one (`mi_db_puerto_nuevo`), to learn the full `docker-compose` setup from scratch.
+- Created `docker-compose.yaml`: `postgres:16` service, `POSTGRES_PASSWORD=1234`, `POSTGRES_DB=bandhub`, port `5433:5432`, named volume mounted at `/var/lib/postgresql/data`.
+- Verified `docker compose up -d` creates the network, volume, and container, and that the API gets a `200 OK` (empty list) against the fresh database — confirming `POSTGRES_DB` auto-creates the `bandhub` database on first init, with no manual `CREATE DATABASE` step needed.
+- Confirmed the existing DBeaver connection (same host/port/user/password/database as before) reconnects without changes, since it targets `localhost:5433` and doesn't know or care which container is behind that port.
+- Kept the old manually-run container (`postgres-server`, plain `docker run`) stopped but not deleted, as a backup.
+- Marked the `docker-compose` item as done in `APP_ROADMAP.md` (Fase 6).
+
+Learned:
+
+- `ddl-auto=update` only manages tables inside an existing database — it never creates the database itself; that's a separate concern.
+- The official `postgres` Docker image runs its init scripts (including creating the database named in `POSTGRES_DB`) only on the *first* boot against an empty data volume — on a reused volume, these env vars are ignored.
+- Basic YAML syntax: `key: value` needs the space after the colon to be recognized as a mapping; no `;`/`,` line terminators (unlike JS/CSS); `ports`/`volumes` under a service are YAML lists (`- item` per line), while each volume list item is itself a single `"name:path"` string with no space after its colon — two different syntaxes side by side in the same file.
+- DBeaver (and any DB client) connects to whatever is listening on `host:port`, not to "a container" — so swapping the container behind `localhost:5433` requires no client-side reconfiguration as long as the same credentials and database name are used.
+
+Pending:
+
+- Resume the rest of Fase 1 next session: `PUT`/`DELETE /api/users/{id}`, DTO naming cleanup, or start testing — to be decided.
+- Optional: add `restart: unless-stopped` to the compose service so the container survives a Docker Desktop/PC restart without a manual `docker compose up -d`.

@@ -1,0 +1,16 @@
+services:
+  # aquí van tus contenedores
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: bandhub
+    ports: 
+      - "5433:5432"
+    volumes: 
+      - bandhub_pg_database:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  # aquí declaras los volúmenes con nombre que usas arriba
+  bandhub_pg_database:
