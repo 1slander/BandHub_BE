@@ -125,3 +125,52 @@ vez. Si luego cambias esa preferencia en los ajustes del sistema pensando
 que "reconfigurará" el móvil desde cero, no pasa nada — ese asistente de
 primer arranque ya no vuelve a ejecutarse salvo que restaures el móvil de
 fábrica (el equivalente a borrar el volumen).
+
+---
+
+## Kanban en GitHub: Issues + Projects
+
+**Explicación:** un kanban es un tablero con columnas (Pendiente → En curso → Hecho) donde cada tarea es una tarjeta que se mueve de izquierda a derecha. En GitHub se monta con dos piezas:
+- **Issues:** cada tarea es una issue del repositorio, con título, descripción y casillas (`- [ ]`) que se pueden marcar. Viven junto al código y se pueden enlazar con ramas y PR (escribir `Closes #3` en un PR cierra la issue 3 al hacer merge).
+- **Projects:** el tablero en sí. Agrupa issues (de uno o varios repos) y las muestra como tabla o como columnas (vista *Board*). La columna de cada tarjeta es su campo *Status*.
+
+Se puede hacer todo a mano desde la web, o automatizarlo con `gh`, la herramienta de GitHub para la terminal.
+
+**Ejemplo en el proyecto:** el tablero "BandHub Bootcamp" se creó con `scripts/create-bootcamp-issues.ps1`, que lee los tickets de `docs/bootcamp/issues.json`. Pasos para repetirlo (por ejemplo, al crear las issues de la Fase 3):
+
+```powershell
+# 1. Instalar gh (una vez)
+winget install --id GitHub.cli
+# 2. Iniciar sesión (GitHub.com → SSH → Login with a web browser)
+gh auth login
+# 3. Dar permiso para gestionar Projects (no viene por defecto)
+gh auth refresh -s project
+
+# Comandos que usa el script, por si hace falta alguno suelto:
+gh label create fase-3 --repo 1slander/BandHub_BE --color "BFD4F2"
+gh project create --owner 1slander --title "BandHub Bootcamp"
+gh issue create --repo 1slander/BandHub_BE --title "BH-13 · Módulo Band" --body-file cuerpo.md --label "bootcamp,fase-3"
+gh project item-add <número-del-proyecto> --owner 1slander --url <url-de-la-issue>
+gh project list --owner 1slander   # para ver el número del proyecto
+```
+
+En la web: perfil → *Projects* → "BandHub Bootcamp" → vista *Board*. Regla de uso: solo una tarjeta en *In Progress* a la vez.
+
+**Analogía:** es la pizarra de corcho con post-its que hay en muchas oficinas. Las issues son los post-its (cada uno con su lista de cosas por hacer) y el Project es la pizarra con sus columnas. `gh` es tener a alguien que te escribe y pega veinte post-its de golpe en vez de hacerlo tú uno a uno.
+
+---
+
+## PATH en Windows (por qué un programa recién instalado "no existe")
+
+**Explicación:** cuando escribes un comando como `gh` o `java`, la terminal no busca en todo el disco: solo mira en una lista de carpetas guardada en una variable de entorno llamada `PATH`. Al instalar un programa, el instalador añade su carpeta a esa lista, pero **cada terminal lee el `PATH` una sola vez, al abrirse**. Una terminal abierta antes de la instalación sigue con la lista antigua y no encuentra el programa. La terminal integrada de VS Code hereda el `PATH` del propio VS Code, así que a veces no basta con abrir otra pestaña: hay que cerrar VS Code entero.
+
+**Ejemplo en el proyecto:** tras `winget install --id GitHub.cli`, la terminal respondía `gh : The term 'gh' is not recognized`. Se arregló recargando el `PATH` en la misma terminal, sin cerrar nada:
+
+```powershell
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+gh --version   # ahora sí responde
+```
+
+La lista se compone de dos partes: la del sistema (`Machine`, para todos los usuarios) y la tuya (`User`). El comando las vuelve a leer y las aplica a la sesión actual.
+
+**Analogía:** es como la agenda de contactos de un móvil que solo se sincroniza al encenderlo. Si alguien te da su número mientras el móvil está encendido, lo apuntas en la nube, pero tu móvil no lo tendrá hasta que lo reinicies o fuerces la sincronización. Recargar el `PATH` es pulsar "sincronizar ahora".
