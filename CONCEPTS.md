@@ -156,7 +156,71 @@ gh project list --owner 1slander   # para ver el número del proyecto
 
 En la web: perfil → *Projects* → "BandHub Bootcamp" → vista *Board*. Regla de uso: solo una tarjeta en *In Progress* a la vez.
 
+**A mano desde la web (sin `gh`):**
+
+- *Crear una issue:* repo → pestaña **Issues** → **New issue**. Título (`BH-13 · Módulo Band`) y criterios como casillas (`- [ ] ...`). En la barra lateral: **Labels** (`bootcamp`, fase), **Projects** ("BandHub Bootcamp") para que entre en el tablero, y **Milestone** si quieres agrupar por fase.
+- *Crear un tablero:* perfil → **Projects** → **New project** → plantilla **Board** (trae Todo / In Progress / Done). Para añadir tarjetas: **+ Add item** al pie de una columna, escribe `#` y elige una issue, o crea una nota rápida y luego conviértela en issue.
+- *Enlazar el tablero al repo:* repo → pestaña **Projects** → **Link a project**.
+- Arrastrar una tarjeta entre columnas cambia su campo *Status*. Puedes añadir columnas propias ("Bloqueado", "En revisión").
+
 **Analogía:** es la pizarra de corcho con post-its que hay en muchas oficinas. Las issues son los post-its (cada uno con su lista de cosas por hacer) y el Project es la pizarra con sus columnas. `gh` es tener a alguien que te escribe y pega veinte post-its de golpe en vez de hacerlo tú uno a uno.
+
+---
+
+## Plantillas de issues y PR, enlazar PR con issues y automatizar el tablero
+
+**Explicación:** GitHub permite que todas las issues y PR sigan la misma estructura, que cada PR quede ligado a su tarea y que el tablero se mueva solo. Son cuatro piezas:
+
+1. **Plantillas de issues.** Ficheros dentro de `.github/ISSUE_TEMPLATE/` en la rama principal. Al pulsar *New issue*, GitHub ofrece elegir entre ellas ("Bug", "Tarea", "Ticket del bootcamp"...) y rellena la descripción. Pueden ser Markdown (`.md`) o formularios (`.yml`) con campos obligatorios.
+2. **Plantilla de PR.** Un único fichero `.github/pull_request_template.md`. Su contenido aparece automáticamente en la descripción de cada PR nuevo.
+3. **Enlazar un PR con su issue.** Tres formas:
+   - Escribir en la descripción del PR una palabra clave seguida del número: `Closes #5`, `Fixes #5` o `Resolves #5`. Al hacer merge **a la rama por defecto**, la issue se cierra sola. Mencionar solo `#5` la enlaza pero no la cierra.
+   - Desde la issue, en la barra lateral **Development** → *Create a branch*: crea la rama ya enlazada.
+   - Desde el PR, en **Development** → elegir la issue.
+4. **Automatizaciones del Project.** En el tablero → menú **⋯** → **Workflows**. Vienen de serie, solo hay que activarlas: *Item closed* → mover a Done, *Pull request merged* → Done, *Auto-add to project* (añade solas las issues del repo que cumplan un filtro, por ejemplo `label:bootcamp`). Además se pueden crear campos propios (prioridad, tamaño, sprint con el tipo *Iteration*) y vistas distintas del mismo tablero (Board, Table, Roadmap).
+
+**Ejemplo en el proyecto:**
+
+`.github/ISSUE_TEMPLATE/ticket.md`:
+```markdown
+---
+name: Ticket del bootcamp
+about: Nuevo ticket BH-xx
+title: "BH-xx · "
+labels: bootcamp
+---
+
+## Objetivo
+<!-- Qué aprende o construye este ticket, en una frase -->
+
+## Criterios de aceptación
+- [ ] 
+
+## Conceptos nuevos
+<!-- Lo que irá a CONCEPTS.md -->
+```
+
+`.github/pull_request_template.md`:
+```markdown
+## Qué cambia
+<!-- Resumen en 2-3 líneas -->
+
+Closes #
+
+## Cómo probarlo
+- [ ] Tests en verde (`./mvnw test`)
+- [ ] Probado a mano: <!-- endpoint y casos -->
+
+## Checklist
+- [ ] STATE.md, APP_ROADMAP.md y Development Log actualizados
+- [ ] Conceptos nuevos añadidos a CONCEPTS.md
+```
+
+Flujo completo de un ticket: issue BH-01 → *Development* → *Create a branch* (`feature/BH-01-update-user`) → commits → PR con `Closes #1` → CI en verde → merge → la issue se cierra y la tarjeta pasa sola a Done.
+
+**Para un equipo de trabajo:** lo que más ordena es combinar plantillas (todo el mundo describe igual las tareas y los PR), la regla "ningún PR sin issue enlazada", y las automatizaciones para que nadie tenga que mover tarjetas a mano. Requisito: que el código esté en GitHub. Si en la empresa usan Azure DevOps o Jira, ambos tienen equivalentes (work items y boards, plantillas de PR, enlace con `AB#123` en Azure DevOps o con la clave del ticket en Jira).
+
+**Analogía:** es como los albaranes con formato fijo de un almacén. La plantilla es el impreso en blanco que obliga a rellenar siempre los mismos campos; el `Closes #5` es grapar el albarán de entrega al pedido original; y las automatizaciones son el empleado que, al ver el albarán grapado, archiva el pedido como "entregado" sin que nadie se lo pida.
 
 ---
 
