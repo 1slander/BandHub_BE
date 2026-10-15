@@ -6,6 +6,15 @@ Development Log o el APP_ROADMAP enteros.
 
 ---
 
+## Aparcamiento (léelo primero)
+
+- **Ticket:** BH-01 · `PUT /api/users/{id}`
+- **Último paso hecho:** plan de aprendizaje montado (`docs/BOOTCAMP.md`). Falta ejecutar `scripts/create-bootcamp-issues.ps1` para crear las issues y el tablero.
+- **Siguiente paso (se empieza en 5 min):** crear la rama `feature/BH-01-update-user` y escribir el record `UserUpdateDTO` con sus validaciones.
+- **Rama:** ninguna todavía (estás en `main`).
+
+---
+
 **Última actualización:** 2026-10-01
 
 **Fase actual:** Fase 1 — retomar el resto del módulo `User` (ver
@@ -27,10 +36,8 @@ con nombre `bandhub_pg_database`.
    falta tocar `SecurityConfig`.
 
 **Decisiones pendientes / sin cerrar:**
-- Añadir `restart: unless-stopped` al servicio de `docker-compose.yaml` para
-  que el contenedor se reinicie solo tras un reinicio de Docker
-  Desktop/del PC (ahora mismo hay que relanzar `docker compose up -d` a
-  mano cada vez que eso pase). Sugerido, no aplicado aún.
+- ~~Añadir `restart: unless-stopped` al servicio de `docker-compose.yaml`.~~
+  Ya aplicado en el compose.
 - El contenedor manual antiguo `postgres-server` (`docker run`, sin
   compose) se deja **parado pero no borrado**, como backup, por si acaso.
   No se usa activamente — el que gestiona la BD ahora es

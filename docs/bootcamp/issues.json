@@ -1,0 +1,62 @@
+[
+ {
+  "title": "BH-01 · PUT /api/users/{id}",
+  "body": "Fase: Fase 1 · Java\n\n## Criterios de aceptación\n\n- [ ] APP_ROADMAP · Fase 1. Actualizar el perfil: name, mainInstrument, location, bio, lookingForBand.\n- [ ] Un UserUpdateDTO propio: el email y la contraseña no se cambian por aquí.\n- [ ] 404 si el usuario no existe (ya tienes UserNotFoundException).\n- [ ] Matcher explícito en SecurityConfig, como hiciste con el GET.\n\n<details><summary>Pistas (abrir tras 30 min atascado)</summary>\n\n- Decide antes de escribir: ¿un campo null en el DTO significa \"bórralo\" o \"no lo toques\"? Apunta la decisión en el Development Log.\n- Con JPA no hace falta llamar a save() si el método es @Transactional: el cambio en la entidad se guarda solo (dirty checking). Pruébalo y añádelo a CONCEPTS.md.\n\n</details>\n\nLecciones de apoyo y detalle: `docs/BOOTCAMP.md`.",
+  "phase": "f1"
+ },
+ {
+  "title": "BH-02 · Baja lógica y listados con streams",
+  "body": "Fase: Fase 1 · Java\n\n## Criterios de aceptación\n\n- [ ] DELETE /api/users/{id} pone active = false y devuelve 204.\n- [ ] GET /api/users devuelve solo usuarios activos.\n- [ ] Filtros opcionales ?instrument= y ?lookingForBand=true, primero resueltos con streams en el servicio.\n- [ ] Después, mueve el filtro a una consulta del repositorio y anota en el Development Log por qué es mejor filtrar en base de datos.\n\n<details><summary>Pistas (abrir tras 30 min atascado)</summary>\n\n- El mapeo entidad → DTO queda en una línea: users.stream().map(...).toList().\n- Spring Data deriva findByActiveTrue y findByActiveTrueAndMainInstrumentIgnoreCase del nombre del método.\n\n</details>\n\nLecciones de apoyo y detalle: `docs/BOOTCAMP.md`.",
+  "phase": "f1"
+ },
+ {
+  "title": "BH-03 · DTOs y errores pulidos",
+  "body": "Fase: Fase 1 · Java\n\n## Criterios de aceptación\n\n- [ ] APP_ROADMAP · Fase 1: revisar el naming de los DTOs (UserCreateDTO, UserUpdateDTO, UserResponseDTO) y limpiar comentarios temporales.\n- [ ] El mapeo entidad → DTO en un único sitio: un método estático UserResponseDTO.from(UserEntity).\n- [ ] Locale.ROOT al normalizar emails, y entrada en CONCEPTS.md explicando por qué (el problema de la i turca).\n- [ ] Un handler para cuerpos JSON mal formados (HttpMessageNotReadableException) que devuelva 400 con ApiErrorResponse.\n\n<details><summary>Pistas (abrir tras 30 min atascado)</summary>\n\n- Un record puede tener métodos estáticos y constructores compactos: es el sitio natural para from().\n- Prueba \"EMAIL@X.COM\".toLowerCase(new Locale(\"tr\")) para ver el bug con tus propios ojos.\n\n</details>\n\nLecciones de apoyo y detalle: `docs/BOOTCAMP.md`.",
+  "phase": "f1"
+ },
+ {
+  "title": "BH-04 · Testing del módulo User",
+  "body": "Fase: Fase 1 · Java\n\n## Criterios de aceptación\n\n- [ ] APP_ROADMAP · Fase 1: unit tests de UserServiceImpl con el repositorio mockeado (Mockito).\n- [ ] @WebMvcTest de UserController: 201, 400 por validación, 404 y 409.\n- [ ] Cubre los casos de PUT y DELETE de las semanas anteriores.\n- [ ] Mínimo 15 tests. Comprueba la cobertura en VS Code.\n\n<details><summary>Pistas (abrir tras 30 min atascado)</summary>\n\n- Con Spring Security activo, @WebMvcTest puede devolverte 401 o 403. Importa tu SecurityConfig con @Import o usa @WithMockUser.\n- @MockitoBean sustituye a @MockBean desde Spring Boot 3.4.\n- Para el PasswordEncoder en el test del servicio, mockéalo también: el test no debe depender de BCrypt.\n\n</details>\n\nLecciones de apoyo y detalle: `docs/BOOTCAMP.md`.",
+  "phase": "f1"
+ },
+ {
+  "title": "BH-CI · CI con GitHub Actions",
+  "body": "Fase: Fase 2 · Auth + Cloud\n\n## Criterios de aceptación\n\n- [ ] Workflow que compila y pasa los tests en cada push y en cada PR.\n- [ ] Badge de estado en el README.\n- [ ] Desde aquí, ningún merge a main con CI en rojo.\n\n<details><summary>Pistas (abrir tras 30 min atascado)</summary>\n\n- Usa la caché de Maven de setup-java.\n- Una sola sesión: es el ticket ideal para volver después del permiso.\n\n</details>\n\nLecciones de apoyo y detalle: `docs/BOOTCAMP.md`.",
+  "phase": "f2"
+ },
+ {
+  "title": "BH-05 · Autenticación I: login con JWT",
+  "body": "Fase: Fase 2 · Auth + Cloud\n\n## Criterios de aceptación\n\n- [ ] APP_ROADMAP · Fase 2: UserDetailsService propio que cargue UserEntity por email.\n- [ ] POST /api/auth/register (decide si sustituye a POST /api/users) y POST /api/auth/login, que devuelve un JWT.\n- [ ] JwtService para generar y validar tokens. El secreto sale de configuración, nunca del código.\n- [ ] Si el login falla, el mismo mensaje para email inexistente y contraseña incorrecta.\n\n<details><summary>Pistas (abrir tras 30 min atascado)</summary>\n\n- Esta semana las lecciones de beans e inyección te explican por qué basta con declarar un @Bean UserDetailsService para que Spring Security lo use.\n- Dos caminos: la librería jjwt con tu propio filtro (lo que dice tu APP_ROADMAP) o spring-boot-starter-oauth2-resource-server. Para aprender, el primero enseña más.\n- Ticket grande: si no cabe en el viernes, el sábado opcional existe para esto.\n\n</details>\n\nLecciones de apoyo y detalle: `docs/BOOTCAMP.md`.",
+  "phase": "f2"
+ },
+ {
+  "title": "BH-06 · Autenticación II + Flyway",
+  "body": "Fase: Fase 2 · Auth + Cloud\n\n## Criterios de aceptación\n\n- [ ] Filtro OncePerRequestFilter que lee el JWT de cada petición.\n- [ ] SecurityConfig con reglas reales: register y login públicos, el resto autenticado. Un usuario solo puede editar o dar de baja su propio perfil.\n- [ ] APP_ROADMAP · Fase 6: Flyway con V1 creando la tabla users tal como está hoy, y ddl-auto=validate.\n- [ ] Tests: 401 sin token, 200 con token, 403 editando a otro usuario.\n- [ ] Tests de integración con Testcontainers: un Postgres real en Docker que comprueba que tus migraciones y tus repositorios funcionan.\n\n<details><summary>Pistas (abrir tras 30 min atascado)</summary>\n\n- Tu base de datos local ya tiene datos: mira spring.flyway.baseline-on-migrate, o borra el volumen (es local y sin datos reales).\n- Para la V1, puedes sacar el SQL que ya genera Hibernate activando show-sql y repasándolo a mano.\n\n</details>\n\nLecciones de apoyo y detalle: `docs/BOOTCAMP.md`.",
+  "phase": "f2"
+ },
+ {
+  "title": "BH-07 · Logs y script de diagnóstico",
+  "body": "Fase: Fase 2 · Auth + Cloud\n\n## Criterios de aceptación\n\n- [ ] Configura BandHub para escribir logs en fichero (logging.file.name).\n- [ ] Script scripts/check-logs.sh: cuenta ERROR y WARN y muestra las 5 excepciones más repetidas.\n- [ ] Sección en el README: cómo arrancar el proyecto desde cero.\n\n<details><summary>Pistas (abrir tras 30 min atascado)</summary>\n\n- grep -o, sort, uniq -c y sort -nr resuelven el top 5.\n- Añade set -euo pipefail al principio del script y averigua qué hace.\n\n</details>\n\nLecciones de apoyo y detalle: `docs/BOOTCAMP.md`.",
+  "phase": "f2"
+ },
+ {
+  "title": "BH-08 · BandHub dockerizado",
+  "body": "Fase: Fase 2 · Auth + Cloud\n\n## Criterios de aceptación\n\n- [ ] Dockerfile multi-stage: compila con el Maven wrapper y ejecuta en una imagen JRE 21 ligera.\n- [ ] Añade el servicio de la app a tu docker-compose.yaml actual; perfil docker con la configuración por variables de entorno.\n- [ ] Saca la contraseña 1234 del compose a un fichero .env que no se sube a Git.\n- [ ] Un .dockerignore y una sección en el README.\n- [ ] Un solo comando deja BandHub funcionando: docker compose up.\n\n<details><summary>Pistas (abrir tras 30 min atascado)</summary>\n\n- healthcheck en Postgres + depends_on con condition: service_healthy.\n- SPRING_DATASOURCE_URL apunta al nombre del servicio, no a localhost.\n\n</details>\n\nLecciones de apoyo y detalle: `docs/BOOTCAMP.md`.",
+  "phase": "f2"
+ },
+ {
+  "title": "BH-09 · Cuenta AWS segura",
+  "body": "Fase: Fase 2 · Auth + Cloud\n\n## Criterios de aceptación\n\n- [ ] Cuenta creada con MFA en root y root sin usar nunca más.\n- [ ] Usuario IAM administrador con MFA y AWS CLI configurada.\n- [ ] Alarma de presupuesto (AWS Budgets) de 5 € con aviso al email.\n- [ ] Notas de infraestructura en docs/infra.md del repo.\n\n<details><summary>Pistas (abrir tras 30 min atascado)</summary>\n\n- El paso de la alarma de coste no es opcional: es lo que te deja experimentar tranquilo.\n\n</details>\n\nLecciones de apoyo y detalle: `docs/BOOTCAMP.md`.",
+  "phase": "f2"
+ },
+ {
+  "title": "BH-10 · Foto de perfil en S3",
+  "body": "Fase: Fase 2 · Auth + Cloud\n\n## Criterios de aceptación\n\n- [ ] POST /api/users/{id}/avatar sube una imagen a S3 y guarda la clave en UserEntity.\n- [ ] GET devuelve la imagen. Solo el propio usuario puede cambiar la suya.\n- [ ] Valida tipo (jpg, png) y tamaño.\n- [ ] Ninguna credencial en el código ni en el repo.\n\n<details><summary>Pistas (abrir tras 30 min atascado)</summary>\n\n- Uso el módulo User porque ya existe; las partituras llegan cuando haya canciones (Fase 3).\n- AWS SDK for Java 2.x, S3Client con DefaultCredentialsProvider: lee las credenciales de la CLI.\n- Una clave tipo users/{id}/avatar-{uuid}.png.\n\n</details>\n\nLecciones de apoyo y detalle: `docs/BOOTCAMP.md`.",
+  "phase": "f2"
+ },
+ {
+  "title": "BH-11 · Primer despliegue",
+  "body": "Fase: Fase 2 · Auth + Cloud\n\n## Criterios de aceptación\n\n- [ ] BandHub corriendo con Docker Compose en una EC2 t3.micro.\n- [ ] Security group: SSH solo desde tu IP y 8080 abierto.\n- [ ] Prueba los endpoints desde fuera y termina la instancia.\n- [ ] Apunta en docs/infra.md lo que has creado y lo que costaría tenerlo encendido.\n\n<details><summary>Pistas (abrir tras 30 min atascado)</summary>\n\n- Un script de user data puede instalar Docker al arrancar la instancia.\n\n</details>\n\nLecciones de apoyo y detalle: `docs/BOOTCAMP.md`.",
+  "phase": "f2"
+ }
+]

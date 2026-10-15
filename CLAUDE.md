@@ -74,6 +74,23 @@ ship. Prioritize teaching and explaining over speed.
   point, and suggest what to learn/read before or while implementing it —
   don't assume it's already known just because it appears in the roadmap.
 
+## Bootcamp (docs/BOOTCAMP.md)
+
+The user follows a learning plan built around BandHub, described in
+`docs/BOOTCAMP.md`. Each `BH-xx` ticket there is also a GitHub issue on the
+"BandHub Bootcamp" project board, and is referenced next to its item in
+`APP_ROADMAP.md`.
+
+- One ticket in progress at a time, no deadlines. Consistency over speed.
+- When the user asks "¿dónde estaba?" (or similar) at the start of a session,
+  read the Aparcamiento block in `STATE.md` and answer in three lines: ticket,
+  where they left off, what to do now.
+- Support lessons in `BOOTCAMP.md` are optional; suggest one only when the
+  current ticket needs a concept the user hasn't covered.
+- Monthly review (first Friday of the month, or when asked): ask the user to
+  explain three concepts from `CONCEPTS.md` without looking, then give
+  feedback. Concepts they can't explain yet go back on the list.
+
 ## Concept glossary (CONCEPTS.md)
 
 Whenever a new or unclear concept comes up during the session (a Spring/JPA
@@ -111,9 +128,17 @@ When the user signals they're ending the session for now (phrases like
 in Spanish or English), before responding, update the project's living docs
 to reflect what happened in this session:
 
-- `STATE.md`: rewrite it to reflect the new "where I left off" — current
-  phase, last file(s) touched, next concrete step, any open decisions or
-  blockers.
+- `STATE.md`: always rewrite the **Aparcamiento** block at the top first,
+  with exactly four lines: current ticket (BH-xx and title), last step done,
+  next step, and current branch. The next step must be a concrete action
+  that can be started in 5 minutes, naming the file or class (e.g. "write the
+  404 test in `UserServiceImplTest`"), never something vague like "continue
+  BH-02". Then update the rest of the file as before — current phase, last
+  file(s) touched, open decisions or blockers.
+- GitHub issue of the current ticket: if `gh` is available and authenticated,
+  tick the acceptance criteria completed this session and, when the ticket is
+  done, close it (the board moves it to Done). If `gh` is not available,
+  remind the user in one line which boxes to tick.
 - `APP_ROADMAP.md`: check off any completed items from this session, and add newly agreed next steps in the right phase.
 - `README.md` Development Log: add a new dated entry (changes, what was
   learned, what's pending), following the existing entries' format.
